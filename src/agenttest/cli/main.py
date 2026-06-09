@@ -27,22 +27,10 @@ def cli() -> None:
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 def run(path: str, replay: bool, verbose: bool) -> None:
     """Run agent tests."""
-    import pytest
+    from agenttest.cli.run import run_tests
     
-    console.print(f"[bold]Running tests in {path}...[/bold]")
-    
-    args = [path, "-v"] if verbose else [path]
-    
-    if replay:
-        console.print("[yellow]Replay mode enabled[/yellow]")
-        # Replay mode would use recorded traces
-    
-    result = pytest.main(args)
-    
-    if result == 0:
-        console.print("[green]All tests passed![/green]")
-    else:
-        console.print("[red]Some tests failed[/red]")
+    result = run_tests(path, verbose=verbose, replay=replay)
+    if result != 0:
         raise SystemExit(result)
 
 
@@ -51,30 +39,9 @@ def run(path: str, replay: bool, verbose: bool) -> None:
 @click.option("--trace-dir", default="./.agenttest/traces", help="Trace directory")
 def replay(run_id: str, trace_dir: str) -> None:
     """Replay a previous test run."""
-    from agenttest.core.replay import ReplayEngine
+    from agenttest.cli.replay import replay_run
     
-    console.print(f"[bold]Replaying run: {run_id}[/bold]")
-    
-    try:
-        engine = ReplayEngine(trace_dir)
-        events = list(engine.replay(run_id))
-        
-        for event in events:
-            event_type = event.get("event_type", "unknown")
-            data = event.get("data", {})
-            
-            if event_type == "user_message":
-                console.print(f"[blue]User:[/blue] {data.get('content', '')}")
-            elif event_type == "agent_response":
-                console.print(f"[green]Agent:[/green] {data.get('output', '')[:100]}...")
-            elif event_type == "tool_call":
-                console.print(f"[yellow]Tool:[/yellow] {data.get('name', '')}")
-        
-        console.print(f"\n[green]Replay complete: {len(events)} events[/green]")
-        
-    except FileNotFoundError:
-        console.print(f"[red]Run not found: {run_id}[/red]")
-        raise SystemExit(1)
+    replay_run(run_id, trace_dir)
 
 
 @cli.command(name="list")
@@ -97,13 +64,13 @@ def list_runs(trace_dir: str, limit: int) -> None:
     table.add_column("Status")
     table.add_column("Agent Type")
     
-    for run in runs:
-        status_style = "green" if run["status"] == "passed" else "red"
+    for run_data in runs:
+        status_style = "green" if run_data["status"] == "passed" else "red"
         table.add_row(
-            run["id"][:8] + "...",
-            run["test_name"],
-            f"[{status_style}]{run['status']}[/{status_style}]",
-            run.get("agent_type", "unknown"),
+            run_data["id"][:8] + "...",
+            run_data["test_name"],
+            f"[{status_style}]{run_data['status']}[/{status_style}]",
+            run_data.get("agent_type", "unknown"),
         )
     
     console.print(table)
