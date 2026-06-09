@@ -1,0 +1,24 @@
+# Flight booking scenario
+
+name: "Flight booking happy path"
+description: "Test a complete flight booking workflow"
+
+steps:
+  - user: "Book a flight from New York to London tomorrow"
+    assert_tool_called:
+      name: "search_flights"
+      arguments:
+        origin: "NYC"
+        destination: "LON"
+    assert_memory:
+      origin: "NYC"
+      destination: "LON"
+      
+  - user: "Pick the cheapest one"
+    assert_tool_called:
+      name: "book_flight"
+    assert_output_matches: "confirmed"
+    
+  - user: "What's my booking reference?"
+    assert_output_matches:
+      llm_judge: "Contains a booking reference number (alphanumeric, 6 chars)"
