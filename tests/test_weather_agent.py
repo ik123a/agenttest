@@ -4,7 +4,15 @@ Test file for the weather agent example.
 
 import pytest
 from agenttest import AgentTest
-from examples.langchain_weather_agent import build_weather_agent
+from tests.fixtures.mock_agent import MockAgent
+
+
+def build_weather_agent() -> MockAgent:
+    """Build a simple weather agent for testing."""
+    return MockAgent(
+        response="The weather is sunny with a high of 22°C.",
+        tools=["get_weather", "get_forecast"],
+    )
 
 
 class TestWeatherAgent:

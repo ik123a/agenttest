@@ -97,7 +97,11 @@ class TestOutputAssertions:
             self.asserts.assert_output_contains("Hello world", "Goodbye")
     
     def test_assert_output_length(self):
-        self.asserts.assert_output_matches("Hi", min_len=2, max_len=10)
+        self.asserts.assert_output_length("Hi", min_len=2, max_len=10)
+    
+    def test_assert_output_length_fails(self):
+        with pytest.raises(AssertionError, match="length"):
+            self.asserts.assert_output_length("Hi", min_len=5)
     
     def test_assert_output_is_json(self):
         self.asserts.assert_output_is_json('{"key": "value"}')

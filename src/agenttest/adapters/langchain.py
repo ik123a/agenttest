@@ -56,10 +56,15 @@ class LangChainAdapter(BaseAgentAdapter):
             # Handle different LangChain agent types
             if hasattr(self.agent, "invoke"):
                 # LCEL chain or AgentExecutor
-                result = self.agent.invoke(
-                    {"input": message, **kwargs},
-                    **{k: v for k, v in kwargs.items() if k != "input"},
-                )
+                # Try dict format first, fall back to string
+                try:
+                    result = self.agent.invoke(
+                        {"input": message, **kwargs},
+                        **{k: v for k, v in kwargs.items() if k != "input"},
+                    )
+                except (TypeError, AttributeError):
+                    # Agent expects simple string input
+                    result = self.agent.invoke(message, **kwargs)
             elif hasattr(self.agent, "run"):
                 # Legacy AgentExecutor
                 result = self.agent.run(message, **kwargs)
