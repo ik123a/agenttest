@@ -1,8 +1,8 @@
 # AgentTest
 
 ![PyPI](https://img.shields.io/pypi/v/agenttest)
-![Tests](https://img.shields.io/github/actions/workflow/status/agenttest/agenttest/ci.yml?branch=main)
-![License](https://img.shields.io/github/license/agenttest/agenttest)
+![Tests](https://img.shields.io/github/actions/workflow/status/ik123a/agenttest/ci.yml?branch=master)
+![License](https://img.shields.io/github/license/ik123a/agenttest)
 ![Python](https://img.shields.io/pypi/pyversions/agenttest)
 
 **pytest for AI agents** – deterministic testing of non-deterministic systems
