@@ -34,6 +34,27 @@ def test_weather_agent():
         test.assert_output_matches(regex=r"22.*sunny")
 ```
 
+## Architecture
+
+```mermaid
+flowchart LR
+    A[Your Test] --> B[AgentTest Context]
+    B --> C[Agent Proxy]
+    C --> D{Agent}
+    D --> E[Tool Calls]
+    D --> F[Memory]
+    D --> G[Response]
+    E --> H[Mock Registry]
+    H --> I[Tool Mocks]
+    F --> J[Memory Assertions]
+    G --> K[Output Assertions]
+    E --> L[Trace Recorder]
+    L --> M[(SQLite DB)]
+    M --> N[Replay Engine]
+```
+
+**Flow:** Test → Context wraps agent → Proxy intercepts calls → Mocks replace real tools → Recorder logs events → Assertions verify behavior
+
 ## Features
 
 - **Tool Mocking** – Replace real tools with mocks, verify call sequences
