@@ -51,3 +51,28 @@ Thumbs.db
 # Distribution
 *.whl
 *.tar.gz
+
+# Auto-added safety ignores for large files and temp data
+node_modules/
+.venv/
+*.pyc
+*.pyo
+.next/
+.gradle/
+local.properties
+*.iml
+.idea/libraries/
+.idea/caches/
+*.h5
+*.pt
+*.bin
+*.gguf
+*.zst
+*.iso
+*.vmdk
+*.dll
+*.exe
+*.zip
+*.7z
+*.rar
+.turbo/
