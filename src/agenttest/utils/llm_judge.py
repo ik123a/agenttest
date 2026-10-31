@@ -10,7 +10,6 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +27,27 @@ class JudgeResult:
     passed: bool
     score: float
     reasoning: str
+
+
+def parse_judge_response(result_text: str) -> JudgeResult:
+    """Parse a judge response without coercing malformed fields into success."""
+    data = json.loads(result_text)
+    if not isinstance(data, dict):
+        raise ValueError("LLM judge response must be a JSON object")
+
+    passed = data.get("passed")
+    if type(passed) is not bool:
+        raise ValueError("LLM judge 'passed' must be a boolean")
+
+    score = data.get("score")
+    if type(score) not in (int, float) or not 0.0 <= score <= 1.0:
+        raise ValueError("LLM judge 'score' must be a finite number between 0 and 1")
+
+    reasoning = data.get("reasoning")
+    if not isinstance(reasoning, str):
+        raise ValueError("LLM judge 'reasoning' must be a string")
+
+    return JudgeResult(passed=passed, score=float(score), reasoning=reasoning)
 
 
 class LLMJudge:
@@ -91,14 +111,7 @@ Respond ONLY with the JSON object, no other text."""
             
             result_text = response.choices[0].message.content.strip()
             
-            # Parse JSON response
-            result_data = json.loads(result_text)
-            
-            return JudgeResult(
-                passed=result_data.get("passed", False),
-                score=float(result_data.get("score", 0.0)),
-                reasoning=result_data.get("reasoning", "No reasoning provided"),
-            )
+            return parse_judge_response(result_text)
             
         except json.JSONDecodeError:
             logger.error(f"Failed to parse LLM response: {result_text}")
