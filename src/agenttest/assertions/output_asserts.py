@@ -11,6 +11,8 @@ import json
 import re
 from typing import Any
 
+from agenttest.utils.llm_judge import parse_judge_response
+
 
 class OutputAssertions:
     """
@@ -252,11 +254,11 @@ Respond with ONLY a JSON object in this exact format:
             )
             
             result_text = response.choices[0].message.content.strip()
-            result = json.loads(result_text)
+            result = parse_judge_response(result_text)
             
-            if not result.get("passed", False):
+            if not result.passed:
                 raise AssertionError(
-                    f"LLM judge failed: {result.get('reasoning', 'No reasoning provided')}"
+                    f"LLM judge failed: {result.reasoning}"
                 )
                 
         except json.JSONDecodeError:

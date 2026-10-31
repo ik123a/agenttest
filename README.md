@@ -62,7 +62,13 @@ flowchart LR
 - **Output Validation** – Regex, JSON schema, or LLM judge evaluation
 - **Trace Recording** – SQLite + msgpack for deterministic replay
 - **Scenario Files** – YAML/JSON multi-step test workflows
-- **Zero Infrastructure** – Runs entirely locally, no Docker needed
+- **Local Test Infrastructure** – Trace storage and deterministic assertions run locally, no Docker needed
+
+LLM judge assertions call the configured model through LiteLLM and may require
+provider credentials, network access, and usage fees. Their judgments can vary,
+even with temperature set to zero. Responses must contain a boolean `passed`, a
+finite numeric `score` from 0 to 1, and string `reasoning`; malformed responses fail
+validation. The unit tests use fake provider responses and make no LLM calls.
 
 ## Installation
 
